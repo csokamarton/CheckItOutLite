@@ -1,24 +1,38 @@
 <?php
 
-namespace App\Providers;
+namespace App\Http\Requests;
 
-use Illuminate\Support\ServiceProvider;
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
-class AppServiceProvider extends ServiceProvider
+class UpdateUserRequest extends FormRequest
 {
     /**
-     * Register any application services.
+     * Determine if the user is authorized to make this request.
      */
-    public function register(): void
+    public function authorize(): bool
     {
-        //
+        return true;
     }
 
     /**
-     * Bootstrap any application services.
+     * Get the validation rules that apply to the request.
+     *
+     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
-    public function boot(): void
+    public function rules(): array
     {
-        //
+        return [
+            'name' => 'sometimes|string|max:255',
+            'email' => [
+                'sometimes',
+                'string',
+                'email',
+                'max:255',
+                Rule::unique('users', 'email')->ignore($this->route('user')),
+            ],
+            'role' => [Rule::in(['admin', 'user'])],
+            'password' => 'nullable|string|min:8',
+        ];
     }
 }

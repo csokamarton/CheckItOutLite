@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ScheduleController;
@@ -12,7 +13,7 @@ Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 
-Route::apiResource("users",UserController::class);
+Route::apiResource("users",UserController::class)->except("index");
 
 Route::apiResource("schedule", ScheduleController::class);
 
@@ -27,11 +28,16 @@ Route::apiResource("tasks", TaskController::class);
 Route::apiResource("categories", CategoryController::class);
 
 
-Route::middleware(['auth:sanctum', 'admin'])->group(function () {
-    Route::get('/users', [UserController::class, 'index']);
-    Route::put('/users/{id}', [UserController::class, 'update']);
-    Route::delete('/users/{id}', [UserController::class, 'destroy']);
-});
+Route::get("users", [AdminController::class, "index"])->middleware("auth:sanctum");
+
+
+// Route::middleware(['auth:sanctum', 'admin'])->group(function () {
+//     Route::get('/users', [UserController::class, 'index']);
+//     Route::put('/users/{id}', [UserController::class, 'update']);
+//     Route::delete('/users/{id}', [UserController::class, 'destroy']);
+// });
+
+
 
 
 Route::get("tasks/today/{user}", [UserController::class, 'taskDoneToday']);

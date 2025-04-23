@@ -31,6 +31,7 @@ class UpdateUserRequest extends FormRequest
                 'max:255',
                 Rule::unique('users', 'email')->ignore($this->route('user')),
             ],
+            'role' => [Rule::in(['admin', 'user'])],
             'password' => 'nullable|string|min:8',
         ];
     }
