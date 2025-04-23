@@ -2,7 +2,7 @@ import { ChangeEvent, FormEvent } from "react";
 import { NavigateFunction } from "react-router-dom";
 import ViewComponent from "../interfaces/ViewComponent";
 import { observer } from "mobx-react-lite";
-import { Box, Button, Container, FormControl, Stack, TextField } from "@mui/material";
+import { Box, Button, Container, FormControl, Paper, Stack, TextField } from "@mui/material";
 import { action, makeObservable, observable } from "mobx";
 import GlobalEntities from "../store/GlobalEntities";
 
@@ -35,7 +35,7 @@ export default class Register implements ViewComponent {
     });
   }
 
-  @action submitForm = async(event: FormEvent) => {
+  @action submitForm = async (event: FormEvent) => {
     event.preventDefault();
 
     if (!this.checkErrors()) {
@@ -44,55 +44,55 @@ export default class Register implements ViewComponent {
         alert(resp.message);
         this.navigate("/login");
       }
-      else{
+      else {
         alert(resp.message);
       }
     }
   }
 
   @action handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-    this.newUser = { ...this.newUser, [event.target.name]: event.target.value as string}
+    this.newUser = { ...this.newUser, [event.target.name]: event.target.value as string }
     this.validateForm();
   }
 
   @action validateForm = () => {
-    if(this.newUser.name === "") {
+    if (this.newUser.name === "") {
       this.errors.name = "Név megadása kötelező";
       this.errors.nameError = true;
       return;
     }
     this.setErrorsDefault();
-    if(this.newUser.email === "") {
+    if (this.newUser.email === "") {
       this.errors.email = "E-mail cím megadása kötelező";
       this.errors.emailError = true;
       return;
     }
     this.setErrorsDefault();
-    if(!this.newUser.email.includes("@")) {
+    if (!this.newUser.email.includes("@")) {
       this.errors.email = "Valós E-mail cím megadása kötelező";
       this.errors.emailError = true;
       return;
     }
     this.setErrorsDefault();
-    if(this.newUser.password === "") {
+    if (this.newUser.password === "") {
       this.errors.password = "Jelszó megadása kötelező";
       this.errors.passwordError = true;
       return;
     }
     this.setErrorsDefault();
-    if(this.newUser.password.length < 8) {
+    if (this.newUser.password.length < 8) {
       this.errors.password = "Jelszónak minimum 8 karakter hosszúnak kell lennie";
       this.errors.passwordError = true;
       return;
     }
     this.setErrorsDefault();
-    if(this.newUser.password_confirmation !== this.newUser.password) {
+    if (this.newUser.password_confirmation !== this.newUser.password) {
       this.errors.password_confirmation = "A jelszó nem egyezik";
       this.errors.password_confirmationError = true;
       return;
     }
     this.setErrorsDefault();
-    
+
   }
 
   @action setErrorsDefault = () => {
@@ -117,8 +117,18 @@ export default class Register implements ViewComponent {
   }
 
   View = observer(() =>
-    <Container>
-      <Stack>
+    <Container sx={{ marginTop: "4rem" }}>
+      <Stack component={Paper}
+        elevation={3}
+        sx={{
+          maxWidth: 400,
+          mx: "auto",
+          p: 4,
+          borderRadius: 4,
+          boxShadow: "0 4px 12px rgba(0,0,0,0.3)",
+          backgroundColor: "background.paper",
+
+        }}>
         <h1>Regisztráció</h1>
         <Box
           component="form"
@@ -127,7 +137,7 @@ export default class Register implements ViewComponent {
         >
           <Stack direction={"column"} gap={4}>
             <FormControl>
-              <TextField 
+              <TextField
                 label="Felhasználó név"
                 id="name"
                 name="name"
@@ -137,7 +147,7 @@ export default class Register implements ViewComponent {
               />
             </FormControl>
             <FormControl>
-              <TextField 
+              <TextField
                 label="E-mail cím"
                 id="email"
                 name="email"
@@ -148,7 +158,7 @@ export default class Register implements ViewComponent {
               />
             </FormControl>
             <FormControl>
-              <TextField 
+              <TextField
                 label="Jelszó"
                 id="password"
                 name="password"
@@ -159,7 +169,7 @@ export default class Register implements ViewComponent {
               />
             </FormControl>
             <FormControl>
-              <TextField 
+              <TextField
                 label="Jelszó újra"
                 id="password_confirmation"
                 name="password_confirmation"
@@ -169,7 +179,7 @@ export default class Register implements ViewComponent {
                 onChange={this.handleChange}
               />
             </FormControl>
-            <Stack direction={{sx:"column", sm:"row"}} justifyContent={"end"}>
+            <Stack direction={{ sx: "column", sm: "row" }} justifyContent={"end"}>
               <Button type="submit" variant="contained" >Regisztrálok</Button>
             </Stack>
           </Stack>
