@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
+import React, { ChangeEvent } from "react";
+import { makeObservable, observable, action } from "mobx";
 import { observer } from "mobx-react-lite";
 import {
   Container,
@@ -13,58 +13,77 @@ import {
   Select,
   MenuItem,
   Stack,
-  Button
 } from "@mui/material";
-import { Edit, Delete, Save, Cancel } from "@mui/icons-material";
+import { Edit, Delete, Save, Cancel, ThirtyFpsRounded } from "@mui/icons-material";
+import ViewComponent from "../interfaces/ViewComponent";
+import { NavigateFunction } from "react-router-dom";
+import GlobalEntities from "../store/GlobalEntities";
 
-interface User {
-  id: number;
-  name: string;
-  email: string;
-  role: "user" | "admin";
-}
+export default class UserManagement implements ViewComponent {
+  @observable accessor editingId: number | null = null;
+  @observable accessor editedUser: Partial<User> = {};
 
-const UserManagement: React.FC = observer(() => {
-  const [users, setUsers] = useState<User[]>([]);
-  const [editingId, setEditingId] = useState<number | null>(null);
-  const [editedUser, setEditedUser] = useState<Partial<User>>({});
+  constructor(public navigate: NavigateFunction) {
+    makeObservable(this);
+    GlobalEntities.fetchUsers();
+  }
 
-  useEffect(() => {
-    axios.get("/api/users").then((res) => setUsers(res.data));
-  }, []);
+  @action handleEdit(user: User) {
+    this.editingId = user.id ?? null;
+    this.editedUser = { ...user }; 
+  }
+  
 
-  const handleEdit = (user: User) => {
-    setEditingId(user.id);
-    setEditedUser({ ...user });
-  };
+  @action handleCancel() {
+    this.editingId = null;
+    this.editedUser = {};
+  }
+  
 
-  const handleCancel = () => {
-    setEditingId(null);
-    setEditedUser({});
-  };
+  handleChange = action(
+    (
+      e:
+        | ChangeEvent<HTMLInputElement>
+        | ChangeEvent<{ name?: string; value: unknown }>
+    ) => {
+      const { name, value } = e.target;
+      if (!name) return;
+      this.editedUser = { ...this.editedUser, [name]: value as string };
+    }
+  );
+  
+  @action async handleSave() {
+    if (!this.editedUser.id) return;
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | { name?: string; value: unknown }>) => {
-    const { name, value } = e.target;
-    setEditedUser((prev) => ({ ...prev, [name as string]: value }));
-  };
+    try {
 
-  const handleSave = () => {
-    if (!editedUser.id) return;
-    axios.put(`/api/users/${editedUser.id}`, editedUser).then(() => {
-      setUsers((prev) =>
-        prev.map((u) => (u.id === editedUser.id ? { ...u, ...editedUser } as User : u))
+      await GlobalEntities.updateUserById(
+        this.editedUser.id,
+        this.editedUser.name ?? "",
+        this.editedUser.email ?? "",
+        this.editedUser.role ?? ""
       );
-      setEditingId(null);
-    });
-  };
 
-  const handleDelete = (id: number) => {
-    axios.delete(`/api/users/${id}`).then(() => {
-      setUsers((prev) => prev.filter((u) => u.id !== id));
-    });
-  };
+      this.editingId = null;
+      this.editedUser = {};
+      await GlobalEntities.fetchUsers();
+    } catch (error) {
+      console.error("Mentés sikertelen:", error);
+    }
+  }
 
-  return (
+  @action async handleDelete(id: number) {
+    if (!window.confirm("Biztosan törölni szeretnéd ezt a felhasználót?")) return;
+
+    try {
+      await GlobalEntities.deleteUser(id);
+      await GlobalEntities.fetchUsers();
+    } catch (error) {
+      console.error("Törlés sikertelen:", error);
+    }
+  }
+
+  View = observer(() => (
     <Container>
       <h2>Felhasználók kezelése</h2>
       <Table>
@@ -77,14 +96,14 @@ const UserManagement: React.FC = observer(() => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {users.map((user) => (
+          {GlobalEntities.users.map((user) => (
             <TableRow key={user.id}>
               <TableCell>
-                {editingId === user.id ? (
+                {this.editingId === user.id ? (
                   <TextField
                     name="name"
-                    value={editedUser.name || ""}
-                    onChange={handleChange}
+                    value={this.editedUser.name || ""}
+                    onChange={this.handleChange}
                     size="small"
                   />
                 ) : (
@@ -92,11 +111,11 @@ const UserManagement: React.FC = observer(() => {
                 )}
               </TableCell>
               <TableCell>
-                {editingId === user.id ? (
+                {this.editingId === user.id ? (
                   <TextField
                     name="email"
-                    value={editedUser.email || ""}
-                    onChange={handleChange}
+                    value={this.editedUser.email || ""}
+                    onChange={this.handleChange}
                     size="small"
                   />
                 ) : (
@@ -104,10 +123,11 @@ const UserManagement: React.FC = observer(() => {
                 )}
               </TableCell>
               <TableCell>
-                {editingId === user.id ? (
+                {this.editingId === user.id ? (
                   <Select
                     name="role"
-                    value={editedUser.role || "user"}
+                    value={this.editedUser.role || "user"}
+                    onChange={this.handleChange}
                     size="small"
                   >
                     <MenuItem value="user">User</MenuItem>
@@ -118,21 +138,21 @@ const UserManagement: React.FC = observer(() => {
                 )}
               </TableCell>
               <TableCell>
-                {editingId === user.id ? (
+                {this.editingId === user.id ? (
                   <Stack direction="row" spacing={1}>
-                    <IconButton onClick={handleSave}>
+                    <IconButton onClick={() => this.handleSave()}>
                       <Save />
                     </IconButton>
-                    <IconButton onClick={handleCancel}>
+                    <IconButton onClick={() => this.handleCancel()}>
                       <Cancel />
                     </IconButton>
                   </Stack>
                 ) : (
                   <Stack direction="row" spacing={1}>
-                    <IconButton onClick={() => handleEdit(user)}>
+                    <IconButton onClick={() => this.handleEdit(user)}>
                       <Edit />
                     </IconButton>
-                    <IconButton onClick={() => handleDelete(user.id)}>
+                    <IconButton onClick={() => this.handleDelete(user.id)}>
                       <Delete />
                     </IconButton>
                   </Stack>
@@ -143,7 +163,5 @@ const UserManagement: React.FC = observer(() => {
         </TableBody>
       </Table>
     </Container>
-  );
-});
-
-export default UserManagement;
+  ));
+}
