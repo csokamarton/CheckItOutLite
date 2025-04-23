@@ -169,7 +169,6 @@ class Entities {
 
 
     @action async fetchUsers() {
-        console.log(localStorage.getItem("userToken"));
         const response = await GlobalApiHandlerInstance.get("/users", {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("userToken")}`,
