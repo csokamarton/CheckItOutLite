@@ -1,38 +1,32 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Providers;
 
-use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
+use App\Models\User;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\ServiceProvider;
 
-class UpdateUserRequest extends FormRequest
+class AppServiceProvider extends ServiceProvider
 {
     /**
-     * Determine if the user is authorized to make this request.
+     * Register any application services.
      */
-    public function authorize(): bool
+    public function register(): void
     {
-        return true;
+        //
     }
 
     /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     * Bootstrap any application services.
      */
-    public function rules(): array
+    public function boot(): void
     {
-        return [
-            'name' => 'sometimes|string|max:255',
-            'email' => [
-                'sometimes',
-                'string',
-                'email',
-                'max:255',
-                Rule::unique('users', 'email')->ignore($this->route('user')),
-            ],
-            'role' => [Rule::in(['admin', 'user'])],
-            'password' => 'nullable|string|min:8',
-        ];
+        Model::shouldBeStrict();
+
+        Gate::define('list-users', function (User $user) {
+            return $user->role == "admin";
+            
+        });
     }
 }
