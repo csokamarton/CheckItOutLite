@@ -1,0 +1,73 @@
+.task-recording-container-main{
+    padding: 10px;
+}
+
+.task-recording-container {
+    padding: 20px;
+    max-width: 800px;
+    margin: 10px auto;
+    background-color: #f9f9f9;
+    border-radius: 7px;
+    box-shadow: 0 7px 10px rgba(0, 0, 0, 0.3);
+}
+
+.task-recording-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.task-recording-type {
+    margin-bottom: 10px;
+}
+
+.task-recording-type label {
+    margin-right: 10px;
+}
+
+.task-recording-label-name{
+    font-weight: bold;
+}
+
+.task-recording-input {
+    width: 97%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.task-recording-textarea {
+    width: 97%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.task-recording-button {
+    width: 30%;
+    padding: 10px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+}
+
+.task-recording-button:hover {
+    background-color: #0056b3;
+}
+
+.task-recording-list {
+    list-style-type: none;
+    padding: 0;
+    margin-top: 20px;
+}
+
+.task-recording-item {
+    padding: 10px;
+    background-color: #fff;
+    margin-bottom: 10px;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}

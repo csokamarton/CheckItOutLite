@@ -1,0 +1,159 @@
+openapi: 3.0.3
+info:
+  title: Example API
+  description: API documentation for the backend service
+  version: 1.0.0
+servers:
+  - url: http://backend.vm1.test/api
+    description: Development server
+paths:
+  /events:
+    get:
+      summary: Get all events
+      operationId: getEvents
+      responses:
+        '200':
+          description: A list of events
+    post:
+      summary: Create a new event
+      operationId: createEvent
+      responses:
+        '201':
+          description: Event created
+  /events/{id}:
+    get:
+      summary: Get a single event
+      operationId: getEvent
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Event details
+    put:
+      summary: Update an event
+      operationId: updateEvent
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Event updated
+    delete:
+      summary: Delete an event
+      operationId: deleteEvent
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Event deleted
+  /schedules:
+    get:
+      summary: Get all schedules
+      operationId: getSchedules
+      responses:
+        '200':
+          description: A list of schedules
+    post:
+      summary: Create a new schedule
+      operationId: createSchedule
+      responses:
+        '201':
+          description: Schedule created
+  /schedules/{id}:
+    get:
+      summary: Get a single schedule
+      operationId: getSchedule
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Schedule details
+    put:
+      summary: Update a schedule
+      operationId: updateSchedule
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Schedule updated
+    delete:
+      summary: Delete a schedule
+      operationId: deleteSchedule
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Schedule deleted
+  /users:
+    get:
+      summary: Get all users
+      operationId: getUsers
+      responses:
+        '200':
+          description: A list of users
+    post:
+      summary: Create a new user
+      operationId: createUser
+      responses:
+        '201':
+          description: User created
+  /users/{id}:
+    get:
+      summary: Get a single user
+      operationId: getUser
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: User details
+    put:
+      summary: Update a user
+      operationId: updateUser
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: User updated
+    delete:
+      summary: Delete a user
+      operationId: deleteUser
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: User deleted
