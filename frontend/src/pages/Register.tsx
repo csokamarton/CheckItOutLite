@@ -5,6 +5,7 @@ import ViewComponent from "../interfaces/ViewComponent";
 import { observer } from "mobx-react-lite";
 import { Box, Button, Container, FormControl, Stack, TextField } from "@mui/material";
 import { action, makeObservable, observable } from "mobx";
+import GlobalEntities from "../store/GlobalEntities";
 
 const _Register: React.FC = () => {
   const navigate = useNavigate();
@@ -107,8 +108,17 @@ export default class Register implements ViewComponent {
 
   @action submitForm = async(event: FormEvent) => {
     event.preventDefault();
-    
-    console.log(this.newUser);
+
+    if (!this.checkErrors()) {
+      const resp = await GlobalEntities.register(this.newUser);
+      if (resp.code === 1) {
+        alert(resp.message);
+        this.navigate("/login");
+      }
+      else{
+        alert(resp.message);
+      }
+    }
   }
 
   @action handleChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -167,6 +177,14 @@ export default class Register implements ViewComponent {
       password_confirmation: "",
       password_confirmationError: false
     }
+  }
+
+  @action checkErrors = () => {
+    const errors = this.errors
+    if (errors.emailError || errors.nameError || errors.passwordError || errors.password_confirmationError) {
+      return true
+    }
+    return false;
   }
 
   View = observer(() =>

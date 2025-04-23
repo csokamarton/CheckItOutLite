@@ -46,11 +46,17 @@ class Entities {
 
     @action register = async (data: Object) => {
         try {
-            const resp = await GlobalApiHandlerInstance.put('/register', data);
-            return resp.data.data.message
+            const resp = await GlobalApiHandlerInstance.post('/register', data);
+            return {
+                message: resp.data.data.message, 
+                code: 1
+            }
         }
         catch {
-            return "Sikertelen regisztráció"
+            return {
+                message: "Sikertelen regisztráció", 
+                code: 0
+            }
         }
     }
 
