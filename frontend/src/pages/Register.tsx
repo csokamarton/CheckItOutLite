@@ -50,12 +50,14 @@ export default class Register implements ViewComponent {
     }
   }
 
-  @action handleChange = (event: ChangeEvent<HTMLInputElement>) => {
+  @action handleChange = async (event: ChangeEvent<HTMLInputElement>) => {
     this.newUser = { ...this.newUser, [event.target.name]: event.target.value as string }
-    this.validateForm();
+    await this.validateForm();
   }
 
-  @action validateForm = () => {
+  @action validateForm = async () => {
+    const emails = await GlobalEntities.getUsedEmail();
+
     if (this.newUser.name === "") {
       this.errors.name = "Név megadása kötelező";
       this.errors.nameError = true;
@@ -70,6 +72,12 @@ export default class Register implements ViewComponent {
     this.setErrorsDefault();
     if (!this.newUser.email.includes("@")) {
       this.errors.email = "Valós E-mail cím megadása kötelező";
+      this.errors.emailError = true;
+      return;
+    }
+    this.setErrorsDefault();
+    if (emails.includes(this.newUser.email)) {
+      this.errors.email = "Ez az e-mail cím már foglalt";
       this.errors.emailError = true;
       return;
     }
