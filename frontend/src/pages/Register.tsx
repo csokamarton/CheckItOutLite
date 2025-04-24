@@ -2,7 +2,7 @@ import { ChangeEvent, FormEvent } from "react";
 import { NavigateFunction } from "react-router-dom";
 import ViewComponent from "../interfaces/ViewComponent";
 import { observer } from "mobx-react-lite";
-import { Box, Button, Container, FormControl, Paper, Stack, TextField } from "@mui/material";
+import { Box, Button, Container, FormControl, Paper, Stack, TextField, Typography } from "@mui/material";
 import { action, makeObservable, observable } from "mobx";
 import GlobalEntities from "../store/GlobalEntities";
 
@@ -129,7 +129,7 @@ export default class Register implements ViewComponent {
           backgroundColor: "background.paper",
 
         }}>
-        <h1>Regisztráció</h1>
+        <Typography variant="h3" component="h1" gutterBottom>Regisztráció</Typography>
         <Box
           component="form"
           onSubmit={this.submitForm}
