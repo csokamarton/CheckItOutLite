@@ -54,7 +54,7 @@ export class BaseCard implements ViewComponent {
     }
 
     View = observer( () => (
-        <Card.Root css={{ "boxShadow": "7px 7px 7px 7px rgb(0,0,0,0.5)", "borderRadius": "0.5rem", "maxWidth":"720px", "margin":"5rem auto" }}>
+        <Card.Root css={{ "boxShadow": "1px 3px 4px 5px rgb(0,0,0,0.2)", "borderRadius": "0.5rem", "maxWidth":"720px", "margin":"5rem auto" }}>
             <Card.Body>
                 <Card.Header>
                     <Heading size="md">{this.task.title}</Heading>
