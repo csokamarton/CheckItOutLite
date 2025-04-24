@@ -34,7 +34,8 @@ const Header = () => {
   };
 
   return (
-    <AppBar position="sticky" sx={{ backgroundColor: "#0044D7" }}>
+    <AppBar position="sticky" 
+      sx={{ backgroundColor: "linear-gradient(to right, #1976d2, #00bcd4)" }}>
       <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
         <Typography variant="h6" sx={{ color: "#F5F5DC", fontWeight: "bold" }}>
           CheckItOut
