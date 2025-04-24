@@ -32,6 +32,7 @@ class Entities {
             tasks: computed,
             fetchUsers: action,
             deleteUser: action,
+            getUsedEmail: action
         });
     }
 
@@ -190,6 +191,13 @@ class Entities {
             },
         });
         this.users = this.users.filter((u) => u.id !== id);
+    }
+
+    @action getUsedEmail = async () => {
+        const resp = await GlobalApiHandlerInstance.get("/emails");
+        const emails : Array<string> = resp.data.emails.filter((email: string) => this.user.email != email);
+        
+        return emails;
     }
 
 }
