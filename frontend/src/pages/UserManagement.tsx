@@ -25,7 +25,6 @@ export default class UserManagement implements ViewComponent {
 
   constructor(public navigate: NavigateFunction) {
     makeObservable(this);
-    GlobalEntities.fetchUsers();
   }
 
   @action handleEdit(user: User) {
