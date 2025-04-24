@@ -5,7 +5,6 @@ import GlobalEntities from "../store/GlobalEntities";
 import { NavigateFunction } from "react-router-dom";
 import { action, makeObservable, observable } from "mobx";
 import { ChangeEvent, FormEvent } from "react";
-import GlobalApiHandlerInstance from "../api/GlobalApiHandlerInstance";
 
 export default class Profile implements ViewComponent {
 
@@ -31,9 +30,13 @@ export default class Profile implements ViewComponent {
             editable: observable,
             name: observable,
             email: observable,
+            errors: observable,
             toggleEdit: action,
             abortEdit: action,
-            toggleModal: action
+            toggleModal: action,
+            handleChange: action,
+            validateForm: action,
+            setErrorsDefault: action
         })
     }
 
@@ -41,6 +44,13 @@ export default class Profile implements ViewComponent {
     public showModal: boolean = false;
     public name: string;
     public email: string;
+
+    public errors = {
+        name: "",
+        nameError: false,
+        email: "",
+        emailError: false
+    }
 
     @action toggleEdit = () => {
         this.editable = !this.editable;
@@ -50,15 +60,19 @@ export default class Profile implements ViewComponent {
         this.showModal = !this.showModal
     }
 
-    @action handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-        const {name, value} = e.target;
+    @action handleChange = async (e: ChangeEvent<HTMLInputElement>) => {
+
+        const { name, value } = e.target;
 
         if (name === "name") {
             this.name = value;
-        } 
+        }
         else {
             this.email = value;
         }
+
+        await this.validateForm();
+        
     }
 
     @action abortEdit = () => {
@@ -82,16 +96,73 @@ export default class Profile implements ViewComponent {
         }
     }
 
+    @action validateForm = async () => {
+        const emails = await GlobalEntities.getUsedEmail();
+
+        if (this.name === "") {
+            this.errors.name = "Név megadása kötelező",
+                this.errors.nameError = true;
+            return;
+        }
+        this.setErrorsDefault();
+        if (this.email === "") {
+            this.errors.email = "E-mail cím megadása kötelező",
+                this.errors.emailError = true;
+            return;
+        }
+        this.setErrorsDefault();
+        if (!this.email.includes('@')) {
+            this.errors.email = "Valós e-mail cím megadása kötelező",
+                this.errors.emailError = true;
+            return;
+        }
+        this.setErrorsDefault();
+        if (emails.includes(this.email)) {
+            this.errors.email = "Ez az e-mail cím már foglalt",
+                this.errors.emailError = true;
+            return;
+        }
+        this.setErrorsDefault();
+    }
+
+    @action setErrorsDefault = () => {
+        this.errors = {
+            name: "",
+            nameError: false,
+            email: "",
+            emailError: false
+        }
+    }
+
     View = observer(() => (
         <Container sx={{ marginY: "2rem" }}>
-            <form>
+            <form noValidate>
                 <Stack direction={"column"}>
                     <FormControl>
-                        <TextField id="name" name="name" sx={{ paddingBottom: 3 }} label="Felhasználó név" variant="filled" value={this.name} disabled={!this.editable} onChange={this.handleChange}/>
-                        <TextField id="email" name="email" label="E-mail cím" variant="filled" value={this.email} disabled={!this.editable} onChange={this.handleChange}/>
+                        <TextField
+                            id="name"
+                            name="name"
+                            sx={{ paddingBottom: 3 }}
+                            label="Felhasználó név"
+                            value={this.name}
+                            disabled={!this.editable}
+                            onChange={this.handleChange}
+                            error={this.errors.nameError}
+                            helperText={this.errors.name}
+                        />
+                        <TextField
+                            id="email"
+                            name="email"
+                            label="E-mail cím"
+                            value={this.email}
+                            disabled={!this.editable}
+                            onChange={this.handleChange}
+                            error={this.errors.emailError}
+                            helperText={this.errors.email}
+                        />
                     </FormControl>
                 </Stack>
-                <Stack sx={{ marginTop: "2rem" }} direction={{xs: "column-reverse", sm:"row"}} gap={2}>
+                <Stack sx={{ marginTop: "2rem" }} direction={{ xs: "column-reverse", sm: "row" }} gap={2}>
                     {
                         this.editable
                             ?
@@ -120,15 +191,15 @@ export default class Profile implements ViewComponent {
                     </Stack>
                     <FormControl>
                         <form onSubmit={this.submitEdit}>
-                            <TextField id="password" type="password" label="Jelszó" variant="standard"/>
+                            <TextField id="password" type="password" label="Jelszó" variant="standard" />
 
-                            <Stack direction={{xs: "column-reverse", sm:"row"}} justifyContent={"space-between"} padding={2} gap={2}>
+                            <Stack direction={{ xs: "column-reverse", sm: "row" }} justifyContent={"space-between"} padding={2} gap={2}>
                                 <Button onClick={this.abortEdit} variant="contained" color="error">Mégse</Button>
                                 <Button type="submit" variant="contained" color="success">Rendben</Button>
                             </Stack>
                         </form>
                     </FormControl>
-                    
+
                 </Stack>
             </Modal>
         </Container>
