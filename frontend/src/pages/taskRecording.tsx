@@ -6,12 +6,13 @@ import { Box, Button, Card, For, Input, Stack, VStack } from '@chakra-ui/react';
 import { action, computed, makeObservable, observable, toJS } from 'mobx';
 import { NavigateFunction } from 'react-router-dom';
 import GlobalEntities from '../store/GlobalEntities';
+import { observer } from 'mobx-react-lite';
 
 
 export default class TaskRecording implements ViewComponent {
   category: Category = {
     id: undefined,
-    name: undefined
+    name: ""
   };
 
   formData: {
@@ -23,14 +24,14 @@ export default class TaskRecording implements ViewComponent {
     status: string,
     user_id: number
   } = {
-    title: "",
-    description: "",
-    due_date: new Date(Date.now()),
-    category_id: 0,
-    priority: 0,
-    status: "új",
-    user_id: (GlobalEntities.user.id as number)
-  }
+      title: "",
+      description: "",
+      due_date: new Date(Date.now()),
+      category_id: 0,
+      priority: 0,
+      status: "új",
+      user_id: (GlobalEntities.user.id as number)
+    }
   errors: { [key: string]: string } = {};
 
   constructor(public navigate: NavigateFunction) {
@@ -61,8 +62,8 @@ export default class TaskRecording implements ViewComponent {
   }
 
   @action handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const {name, value} = e.target;
-    
+    const { name, value } = e.target;
+
     if (name === "category_id") {
       this.formData.category_id = Number(value);
     }
@@ -81,7 +82,7 @@ export default class TaskRecording implements ViewComponent {
     this.errors = {}
     this.validateForm();
     if (this.validateForm()) {
-      this.formData.due_date = (this.formData.due_date as Date).toISOString().slice(0,19).replace("T", " ")
+      this.formData.due_date = (this.formData.due_date as Date).toISOString().slice(0, 19).replace("T", " ")
       const resp = await GlobalEntities.createTask(this.formData);
       if (resp.status === 201) {
         alert("Sikeresen létrehozva");
@@ -97,15 +98,15 @@ export default class TaskRecording implements ViewComponent {
     this.formData.category_id = Number(event.target.value);
   }
 
-  @computed get categoryName() {
-    return this.category.name === undefined ? "" : this.category.name;
+  @computed get categoryId() {
+    return this.category.id === undefined ? "" : this.category.id.toString();
   }
 
   @computed get errorTitle() {
     return this.errors.title === undefined ? false : true;
   }
 
-  View = () => (
+  View = observer(() => (
     <Stack maxWidth={720} padding={20} margin={"auto"}>
       <Card.Root variant='outline' >
         <Card.Header>
@@ -160,11 +161,13 @@ export default class TaskRecording implements ViewComponent {
                   labelId='categoryLabel'
                   label='Kategória'
                   id='category'
-                  value={this.category.name}
+                  value={this.categoryId}
                   onChange={this.handleSelectChange}
                   required
                 >
-
+                  <MenuItem value="">
+                    <em>None</em>
+                  </MenuItem>
                   {toJS(GlobalEntities.categories).map((category: Category) => {
                     return (
                       <MenuItem key={category.id} value={category.id}>{category.name}</MenuItem>
@@ -196,5 +199,5 @@ export default class TaskRecording implements ViewComponent {
       </Card.Root>
 
     </Stack>
-  );
+  ));
 }
