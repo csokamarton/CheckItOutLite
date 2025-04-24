@@ -87,4 +87,13 @@ class UserController extends Controller
         return TaskResource::collection($tasks);
     }
 
+    public function emails(): JsonResponse
+    {
+        $emails = User::all()->pluck('email');
+
+        return response()->json([
+            'emails' => $emails,
+        ]);
+    }
+
 }

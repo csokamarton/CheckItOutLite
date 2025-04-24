@@ -41,3 +41,5 @@ Route::get("users", [AdminController::class, "index"])->middleware("auth:sanctum
 
 
 Route::get("tasks/today/{user}", [UserController::class, 'taskDoneToday']);
+
+Route::get('/emails', [UserController::class, 'emails']);
