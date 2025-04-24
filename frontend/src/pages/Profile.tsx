@@ -1,6 +1,6 @@
 import { observer } from "mobx-react-lite";
 import ViewComponent from "../interfaces/ViewComponent";
-import { Button, Container, FormControl, Modal, Stack, TextField } from "@mui/material";
+import { Alert, AlertColor, Button, Container, FormControl, Modal, Snackbar, Stack, TextField } from "@mui/material";
 import GlobalEntities from "../store/GlobalEntities";
 import { NavigateFunction } from "react-router-dom";
 import { action, makeObservable, observable } from "mobx";
@@ -31,12 +31,17 @@ export default class Profile implements ViewComponent {
             name: observable,
             email: observable,
             errors: observable,
+            alertStatus: observable,
+            alertMessage: observable,
+            alertType: observable,
             toggleEdit: action,
             abortEdit: action,
             toggleModal: action,
             handleChange: action,
             validateForm: action,
-            setErrorsDefault: action
+            setErrorsDefault: action,
+            handleClose: action,
+            openAlert: action
         })
     }
 
@@ -44,6 +49,9 @@ export default class Profile implements ViewComponent {
     public showModal: boolean = false;
     public name: string;
     public email: string;
+    public alertStatus = false;
+    public alertMessage = "";
+    public alertType = "";
 
     public errors = {
         name: "",
@@ -72,7 +80,6 @@ export default class Profile implements ViewComponent {
         }
 
         await this.validateForm();
-        
     }
 
     @action abortEdit = () => {
@@ -87,11 +94,11 @@ export default class Profile implements ViewComponent {
 
         const resp = await GlobalEntities.updateUser(this.name, this.email, e.target.password.value);
         if (resp != 0) {
-            alert(resp);
+            this.openAlert(resp as string, "success");
             this.abortEdit();
         }
         else {
-            alert("Hibás jelszó");
+            this.openAlert("Hibás jelszó", "error");
             this.abortEdit();
         }
     }
@@ -132,6 +139,18 @@ export default class Profile implements ViewComponent {
             email: "",
             emailError: false
         }
+    }
+
+    @action handleClose = () => {
+        this.alertStatus = false;
+        this.alertMessage = "";
+        this.alertType = "";
+    }
+
+    @action openAlert = (message: string, type: string) => {
+        this.alertMessage = message;
+        this.alertType = type;
+        this.alertStatus = true;
     }
 
     View = observer(() => (
@@ -202,6 +221,16 @@ export default class Profile implements ViewComponent {
 
                 </Stack>
             </Modal>
+
+            <Snackbar
+                open={this.alertStatus}
+                autoHideDuration={6000} 
+                onClose={this.handleClose}
+            >
+                <Alert variant="filled" severity={this.alertType as AlertColor}>
+                    {this.alertMessage}
+                </Alert>
+            </Snackbar>
         </Container>
     ));
 }
