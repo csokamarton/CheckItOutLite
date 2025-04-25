@@ -19,7 +19,7 @@ class AdminControllerTest extends TestCase
         $this->seed(\Database\Seeders\UserSeeder::class);
     }
 
-    public function admin_can_list_users()
+    public function test_admin_can_list_users()
     {
         $admin = User::where('email', 'admin@admin.com')->first();
 
@@ -34,5 +34,15 @@ class AdminControllerTest extends TestCase
                 'role'
             ]]
         ]);
+    }
+
+
+    public function test_non_admin_cannot_list_users()
+    {
+        $user = User::where('email', 'user@user.com')->first();
+
+        $response = $this->actingAs($user)->getJson('/api/users');
+
+        $response->assertStatus(403);
     }
 }
