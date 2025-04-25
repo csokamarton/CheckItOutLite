@@ -65,4 +65,19 @@ class AdminControllerTest extends TestCase
         $response->assertStatus(201);
         $this->assertDatabaseHas('users', ['email' => 'test@example.com']);
     }
+
+
+    public function test_admin_can_update_user()
+    {
+        $admin = User::where('email', 'admin@admin.com')->first();
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($admin)->putJson("/api/users/{$user->id}", [
+            'name' => 'Updated Name',
+            'email' => 'updated@example.com',
+        ]);
+
+        $response->assertStatus(200);
+        $this->assertDatabaseHas('users', ['email' => 'updated@example.com']);
+    }
 }
