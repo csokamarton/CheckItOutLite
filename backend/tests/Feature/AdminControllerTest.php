@@ -18,4 +18,21 @@ class AdminControllerTest extends TestCase
         parent::setUp();
         $this->seed(\Database\Seeders\UserSeeder::class);
     }
+
+    public function admin_can_list_users()
+    {
+        $admin = User::where('email', 'admin@admin.com')->first();
+
+        $response = $this->actingAs($admin)->getJson('/api/users');
+
+        $response->assertOk();
+        $response->assertJsonStructure([
+            'data' => [[
+                'id',
+                'name',
+                'email',
+                'role'
+            ]]
+        ]);
+    }
 }
