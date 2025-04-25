@@ -45,4 +45,24 @@ class AdminControllerTest extends TestCase
 
         $response->assertStatus(403);
     }
+
+
+
+    public function test_admin_can_create_user()
+    {
+        $admin = User::where('email', 'admin@admin.com')->first();
+        
+        $payload = [
+            'name' => 'Test User',
+            'email' => 'test@example.com',
+            'password' => 'test1234',
+            'password_confirmation' => 'test1234',
+            'role' => 'customer'
+        ];
+
+        $response = $this->actingAs($admin)->postJson('/api/users', $payload);
+
+        $response->assertStatus(201);
+        $this->assertDatabaseHas('users', ['email' => 'test@example.com']);
+    }
 }
