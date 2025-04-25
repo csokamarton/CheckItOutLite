@@ -11,6 +11,7 @@ import ViewComponent from './interfaces/ViewComponent';
 import GlobalEntities from './store/GlobalEntities';
 import Profile from './pages/Profile';
 import UserManagement from './pages/UserManagement';
+import NotFound from "./pages/NotFound";
 
 export default class App implements ViewComponent{
   constructor(private navigate: NavigateFunction ) {
@@ -62,6 +63,7 @@ export default class App implements ViewComponent{
           <Route path='/login' element={<this.login.View/>} />
           <Route path='/admin/users' element={<this.userManagement.View/>} />
           
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </Layout>
     );
