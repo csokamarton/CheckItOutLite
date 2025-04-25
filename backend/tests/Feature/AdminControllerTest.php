@@ -92,4 +92,11 @@ class AdminControllerTest extends TestCase
         $response->assertStatus(200);
         $this->assertDatabaseMissing('users', ['id' => $user->id]);
     }
+
+
+    public function test_guest_cannot_access_admin_routes()
+    {
+        $response = $this->getJson('/api/users');
+        $response->assertStatus(401);
+    }
 }
