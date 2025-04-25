@@ -80,4 +80,16 @@ class AdminControllerTest extends TestCase
         $response->assertStatus(200);
         $this->assertDatabaseHas('users', ['email' => 'updated@example.com']);
     }
+
+
+    public function test_admin_can_delete_user()
+    {
+        $admin = User::where('email', 'admin@admin.com')->first();
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($admin)->deleteJson("/api/users/{$user->id}");
+
+        $response->assertStatus(200);
+        $this->assertDatabaseMissing('users', ['id' => $user->id]);
+    }
 }
