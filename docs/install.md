@@ -1,4 +1,6 @@
-# Teleítési útmutató
+# Telepítési útmutató
+
+> Figyelem! Az .env.example fájl a backend mappában található, és a .env fájl is ott lesz, mert a backend szerves része. Mivel ezt a többi container is használja, így egy hivatkozás jön létre indításkor a projektmappában.
 
 ### 1. Host fájl szerkesztése 
 
@@ -19,3 +21,9 @@ Adatbázis létrehozása és mintaadatok feltöltése
 
 Nyisd meg az egyik bőngészőben a projektet, az alábbi linken: 
 ```checkitoutlite.test```
+
+## Leállítás
+
+```
+docker compose stop
+```
