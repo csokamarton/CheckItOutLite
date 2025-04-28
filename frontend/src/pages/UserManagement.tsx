@@ -22,6 +22,7 @@ import GlobalEntities from "../store/GlobalEntities";
 export default class UserManagement implements ViewComponent {
   @observable accessor editingId: number | null = null;
   @observable accessor editedUser: Partial<User> = {};
+  public oldEmail = "";
 
   public errors = {
     name: "",
@@ -31,12 +32,16 @@ export default class UserManagement implements ViewComponent {
   }
 
   constructor(public navigate: NavigateFunction) {
-    makeObservable(this);
+    makeObservable(this, {
+      handleChange: action,
+      errors: observable
+    });
   }
 
   @action handleEdit(user: User) {
     this.editingId = user.id ?? null;
     this.editedUser = { ...user };
+    this.oldEmail = user.email as string;
   }
 
 
@@ -99,10 +104,12 @@ export default class UserManagement implements ViewComponent {
 
 
   @action validateForm = async () => {
-    const emails = await GlobalEntities.getUsedEmail();
-
+    let emails = await GlobalEntities.getUsedEmailAdmin();
+    emails = emails.filter((e: string) => e != this.oldEmail);
+    
     switch (true) {
       case this.editedUser.name === "":
+        this.setErrorsDefault();
         this.errors.name = "Név megadása kötelező";
         this.errors.nameError = true;
         return;
@@ -112,7 +119,7 @@ export default class UserManagement implements ViewComponent {
         this.errors.email = "E-mail cím megadása kötelező";
         this.errors.emailError = true;
         return;
-      case !(this.editedUser.email as string).includes("@"):
+      case !(this.oldEmail as string).includes("@"):
         this.setErrorsDefault();
         this.errors.email = "Valós E-mail cím megadása kötelező";
         this.errors.emailError = true;

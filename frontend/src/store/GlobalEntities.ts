@@ -214,6 +214,12 @@ class Entities {
         return emails;
     }
 
+    @action getUsedEmailAdmin = async () => {
+        const resp = await GlobalApiHandlerInstance.get("/emails");
+
+        return resp.data.emails;
+    }
+
 }
 
 const GlobalEntities = new Entities();
