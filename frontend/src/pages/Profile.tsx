@@ -1,10 +1,11 @@
 import { observer } from "mobx-react-lite";
 import ViewComponent from "../interfaces/ViewComponent";
-import { Alert, AlertColor, Button, Container, FormControl, Modal, Snackbar, Stack, TextField } from "@mui/material";
+import { Button, Container, FormControl, Modal, Snackbar, Stack, TextField } from "@mui/material";
 import GlobalEntities from "../store/GlobalEntities";
 import { NavigateFunction } from "react-router-dom";
-import { action, makeObservable, observable } from "mobx";
+import { action, computed, makeObservable, observable } from "mobx";
 import { ChangeEvent, FormEvent } from "react";
+import AlertBar from "../components/AlertBar";
 
 export default class Profile implements ViewComponent {
 
@@ -40,8 +41,6 @@ export default class Profile implements ViewComponent {
             handleChange: action,
             validateForm: action,
             setErrorsDefault: action,
-            handleClose: action,
-            openAlert: action
         })
     }
 
@@ -65,7 +64,7 @@ export default class Profile implements ViewComponent {
     }
 
     @action toggleModal = () => {
-        this.showModal = !this.showModal
+        this.showModal = !this.showModal;
     }
 
     @action handleChange = async (e: ChangeEvent<HTMLInputElement>) => {
@@ -82,10 +81,11 @@ export default class Profile implements ViewComponent {
         await this.validateForm();
     }
 
-    @action abortEdit = () => {
+    @action abortEdit = async () => {
         this.name = (GlobalEntities.user.name as string);
         this.email = (GlobalEntities.user.email as string);
         this.toggleModal();
+        await this.validateForm();
         this.toggleEdit();
     }
 
@@ -94,11 +94,11 @@ export default class Profile implements ViewComponent {
 
         const resp = await GlobalEntities.updateUser(this.name, this.email, e.target.password.value);
         if (resp != 0) {
-            this.openAlert(resp as string, "success");
+            this.Alert.toggleAlert(true, resp as string, "success")
             this.abortEdit();
         }
         else {
-            this.openAlert("Hibás jelszó", "error");
+            this.Alert.toggleAlert(true, "Sikertelen módosítás", "error")
             this.abortEdit();
         }
     }
@@ -141,16 +141,9 @@ export default class Profile implements ViewComponent {
         }
     }
 
-    @action handleClose = () => {
-        this.alertStatus = false;
-        this.alertMessage = "";
-        this.alertType = "";
-    }
 
-    @action openAlert = (message: string, type: string) => {
-        this.alertMessage = message;
-        this.alertType = type;
-        this.alertStatus = true;
+    @computed get Alert() {
+        return new AlertBar;
     }
 
     View = observer(() => (
@@ -222,15 +215,7 @@ export default class Profile implements ViewComponent {
                 </Stack>
             </Modal>
 
-            <Snackbar
-                open={this.alertStatus}
-                autoHideDuration={6000} 
-                onClose={this.handleClose}
-            >
-                <Alert variant="filled" severity={this.alertType as AlertColor}>
-                    {this.alertMessage}
-                </Alert>
-            </Snackbar>
+            {< this.Alert.View />}
         </Container>
     ));
 }
