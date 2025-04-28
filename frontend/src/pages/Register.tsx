@@ -33,7 +33,6 @@ export default class Register implements ViewComponent {
       errors: observable,
       submitForm: action,
       handleChange: action,
-      Alert: computed
     });
   }
 
