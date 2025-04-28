@@ -32,33 +32,71 @@ export default class TaskRecording implements ViewComponent {
       status: "új",
       user_id: (GlobalEntities.user.id as number)
     }
-  errors: { [key: string]: string } = {};
 
+  public errors = {
+    title: "",
+    titleError: false,
+    description: "",
+    descriptionError: false,
+    due_date: "",
+    due_dateError: false,
+    priority: "",
+    priotityError: false,
+    category: "",
+    categoryError: false
+  };
+
+  public today;
   constructor(public navigate: NavigateFunction) {
+    this.today = new Date();
+    this.today.setHours(0, 0, 0, 0);
     makeObservable(this, {
       category: observable,
+      errors: observable,
+      formData: observable,
       handleSelectChange: action,
       validateForm: action,
       submitForm: action,
-      errors: observable,
-      formData: observable
     });
   }
 
   @action validateForm = () => {
-    let newErrors: { [key: string]: string } = {};
+    if (this.formData.title == "") {
+      this.errors.titleError = true;
+      this.errors.title = "Feladat név megadása kötelező";
+      return;
+    }
+    this.setErrorsDefault();
     if (this.formData.title.length > 50) {
-      newErrors.title = "A feladat neve nem lehethosszabb 50 karakternél!";
+      this.errors.titleError = true;
+      this.errors.title = "Feladat név nem lehet hosszabb 50 karakternél";
+      return;
     }
+    this.setErrorsDefault();
     if (this.formData.description.length > 255) {
-      newErrors.title = "A feladat leírása nem lehethosszabb 255 karakternél!";
+      this.errors.descriptionError = true;
+      this.errors.description = "A leírás nem lehet hosszabb 255 karakternél";
+      return;
     }
-    if (this.formData.due_date <= new Date(Date.now())) {
-      newErrors.due_date = "A feladat határideje nem lehet korábban mint holnap!";
+    this.setErrorsDefault();
+    if (this.formData.due_date < this.today) {
+      this.errors.due_dateError = true;
+      this.errors.due_date = "Feladat határideje nem lehet korábban mint ma";
+      return;
     }
-    this.errors = newErrors;
-
-    return Object.keys(this.errors).length === 0;
+    this.setErrorsDefault();
+    if (this.formData.priority < 0 || this.formData.priority > 10) {
+      this.errors.priotityError = true;
+      this.errors.priority = "Prioritás 0 és 10 közzé kell essen";
+      return;
+    }
+    this.setErrorsDefault();
+    if (this.formData.category_id == 0) {
+      this.errors.categoryError = true;
+      this.errors.category = "Kategória választása kötelező";
+      return;
+    }
+    this.setErrorsDefault();
   }
 
   @action handleChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -75,13 +113,15 @@ export default class TaskRecording implements ViewComponent {
     }
     if (name === "title") this.formData.title = value;
     if (name === "description") this.formData.description = value;
+
+    this.validateForm();
   };
 
   @action submitForm = async (event: FormEvent) => {
     event.preventDefault();
-    this.errors = {}
+
     this.validateForm();
-    if (this.validateForm()) {
+    if (true) {
       this.formData.due_date = (this.formData.due_date as Date).toISOString().slice(0, 19).replace("T", " ")
       const resp = await GlobalEntities.createTask(this.formData);
       if (resp.status === 201) {
@@ -96,14 +136,26 @@ export default class TaskRecording implements ViewComponent {
     this.category.name = GlobalEntities.categories.find((element) => element.id === this.category.id)?.name;
 
     this.formData.category_id = Number(event.target.value);
+    this.validateForm();
   }
 
   @computed get categoryId() {
     return this.category.id === undefined ? "" : this.category.id.toString();
   }
 
-  @computed get errorTitle() {
-    return this.errors.title === undefined ? false : true;
+  @action setErrorsDefault = () => {
+    this.errors = {
+      title: "",
+      titleError: false,
+      description: "",
+      descriptionError: false,
+      due_date: "",
+      due_dateError: false,
+      priority: "",
+      priotityError: false,
+      category: "",
+      categoryError: false
+    };
   }
 
   View = observer(() => (
@@ -114,7 +166,7 @@ export default class TaskRecording implements ViewComponent {
           <Card.Description>Töltsd ki az űrlapot a feladat felvételéhez</Card.Description>
         </Card.Header>
         <Card.Body>
-          <form onSubmit={this.submitForm}>
+          <form onSubmit={this.submitForm} noValidate>
             <VStack>
               <FormControl fullWidth>
                 <TextField
@@ -123,8 +175,7 @@ export default class TaskRecording implements ViewComponent {
                   name='title'
                   id='title'
                   fullWidth
-                  required
-                  error={this.errorTitle}
+                  error={this.errors.titleError}
                   helperText={this.errors.title}
                   onChange={this.handleChange}
                 />
@@ -136,7 +187,8 @@ export default class TaskRecording implements ViewComponent {
                   name='description'
                   id='descreption'
                   fullWidth
-                  required
+                  error={this.errors.descriptionError}
+                  helperText={this.errors.description}
                   onChange={this.handleChange}
                 />
               </ FormControl>
@@ -150,7 +202,8 @@ export default class TaskRecording implements ViewComponent {
                     { inputLabel: { shrink: true } }
                   }
                   fullWidth
-                  required
+                  error={this.errors.due_dateError}
+                  helperText={this.errors.due_date}
                   onChange={this.handleChange}
                 />
               </ FormControl>
@@ -163,7 +216,7 @@ export default class TaskRecording implements ViewComponent {
                   id='category'
                   value={this.categoryId}
                   onChange={this.handleSelectChange}
-                  required
+
                 >
                   <MenuItem value="">
                     <em>None</em>
@@ -185,7 +238,8 @@ export default class TaskRecording implements ViewComponent {
                   slotProps={
                     { htmlInput: { 'max': 10, 'min': 0 } }
                   }
-                  required
+                  error={this.errors.priotityError}
+                  helperText={this.errors.priority}
                   onChange={this.handleChange}
                 />
               </FormControl>
