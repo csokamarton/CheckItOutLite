@@ -23,34 +23,40 @@ export default class UserManagement implements ViewComponent {
   @observable accessor editingId: number | null = null;
   @observable accessor editedUser: Partial<User> = {};
 
+  public errors = {
+    name: "",
+    nameError: false,
+    email: "",
+    emailError: false,
+  }
+
   constructor(public navigate: NavigateFunction) {
     makeObservable(this);
   }
 
   @action handleEdit(user: User) {
     this.editingId = user.id ?? null;
-    this.editedUser = { ...user }; 
+    this.editedUser = { ...user };
   }
-  
+
 
   @action handleCancel() {
     this.editingId = null;
     this.editedUser = {};
   }
-  
 
-  handleChange = action(
-    (
-      e:
-        | ChangeEvent<HTMLInputElement>
-        | ChangeEvent<{ name?: string; value: unknown }>
-    ) => {
-      const { name, value } = e.target;
-      if (!name) return;
-      this.editedUser = { ...this.editedUser, [name]: value as string };
-    }
-  );
-  
+
+  @action handleChange = async (
+    e:
+      | ChangeEvent<HTMLInputElement>
+      | ChangeEvent<{ name?: string; value: unknown }>
+  ) => {
+    const { name, value } = e.target;
+    if (!name) return;
+    this.editedUser = { ...this.editedUser, [name]: value as string };
+    await this.validateForm();
+  };
+
   @action async handleSave() {
     if (!this.editedUser.id) return;
 
@@ -82,6 +88,51 @@ export default class UserManagement implements ViewComponent {
     }
   }
 
+  @action setErrorsDefault = () => {
+    this.errors = {
+      name: "",
+      nameError: false,
+      email: "",
+      emailError: false
+    }
+  }
+
+
+  @action validateForm = async () => {
+    const emails = await GlobalEntities.getUsedEmail();
+
+    if (!this.editedUser.name || this.editedUser.name.trim() === "") {
+      this.errors.name = "Név megadása kötelező";
+      this.errors.nameError = true;
+      return;
+    }
+
+    if (!this.editedUser.email || this.editedUser.email.trim() === "") {
+      this.setErrorsDefault();
+      this.errors.email = "E-mail cím megadása kötelező";
+      this.errors.emailError = true;
+      return;
+    }
+
+    if (!this.editedUser.email.includes("@")) {
+      this.setErrorsDefault();
+      this.errors.email = "Valós E-mail cím megadása kötelező";
+      this.errors.emailError = true;
+      return;
+    }
+
+    if (emails.includes(this.editedUser.email)) {
+      this.setErrorsDefault();
+      this.errors.email = "Ez az e-mail cím már foglalt";
+      this.errors.emailError = true;
+      return;
+    }
+
+    this.setErrorsDefault();
+  };
+
+
+
   View = observer(() => (
     <Container>
       <h2>Felhasználók kezelése</h2>
@@ -97,13 +148,16 @@ export default class UserManagement implements ViewComponent {
         <TableBody>
           {GlobalEntities.users.map((user) => (
             <TableRow key={user.id}>
-              <TableCell>
+              <TableCell
+              >
                 {this.editingId === user.id ? (
                   <TextField
                     name="name"
                     value={this.editedUser.name || ""}
                     onChange={this.handleChange}
                     size="small"
+                    error={this.errors.nameError}
+                    helperText={this.errors.name}
                   />
                 ) : (
                   user.name
@@ -116,6 +170,8 @@ export default class UserManagement implements ViewComponent {
                     value={this.editedUser.email || ""}
                     onChange={this.handleChange}
                     size="small"
+                    error={this.errors.emailError}
+                    helperText={this.errors.email}
                   />
                 ) : (
                   user.email
@@ -151,7 +207,7 @@ export default class UserManagement implements ViewComponent {
                     <IconButton onClick={() => this.handleEdit(user)}>
                       <Edit />
                     </IconButton>
-                    <IconButton onClick={() => this.handleDelete(user.id)}>
+                    <IconButton onClick={() => this.handleDelete(user.id as number)}>
                       <Delete />
                     </IconButton>
                   </Stack>
