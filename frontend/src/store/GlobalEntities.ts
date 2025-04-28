@@ -62,23 +62,37 @@ class Entities {
     }
 
     @action login = async (email: string, password: string) => {
-        const loginResponse = await GlobalApiHandlerInstance.post(`/login`, { email, password });
+        try {
+            const loginResponse = await GlobalApiHandlerInstance.post(`/login`, { email, password });
 
-        localStorage.setItem("userToken", loginResponse.data.data.token);
-
-        const userDataResponse = await GlobalApiHandlerInstance.get('/user', {
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem("userToken")}`
+            localStorage.setItem("userToken", loginResponse.data.data.token);
+    
+            const userDataResponse = await GlobalApiHandlerInstance.get('/user', {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem("userToken")}`
+                }
+            })
+    
+            this.user = userDataResponse.data;
+            await GlobalEntities.loadTasks();
+            await GlobalEntities.loadDoneTasks();
+    
+            if (GlobalEntities.user.role == "admin") {
+                await GlobalEntities.fetchUsers();
             }
-        })
 
-        this.user = userDataResponse.data;
-        await GlobalEntities.loadTasks();
-        await GlobalEntities.loadDoneTasks();
-
-        if (GlobalEntities.user.role == "admin") {
-            await GlobalEntities.fetchUsers();
+            return {
+                message: "Sikeres bejelentkezés", 
+                code: 1
+            }
         }
+        catch {
+            return {
+                message: "Sikertelen bejelentkezés", 
+                code: 0
+            }
+        }
+        
 
     }
 

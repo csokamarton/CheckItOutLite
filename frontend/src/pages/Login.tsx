@@ -6,6 +6,8 @@ import ViewComponent from "../interfaces/ViewComponent";
 import { Heading, Input, Text } from "@chakra-ui/react";
 import { FormControl, FormLabel, Box, Typography, TextField, Button, Link, Paper } from "@mui/material";
 import GlobalEntities from "../store/GlobalEntities";
+import AlertBar from "../components/AlertBar";
+import { observer } from "mobx-react-lite";
 
 export default class Login implements ViewComponent {
   formData = {
@@ -22,9 +24,14 @@ export default class Login implements ViewComponent {
       handleChange: action,
       validateForm: action,
       isValidForm: computed,
-      handleSubmit: action
+      handleSubmit: action,
     });
   }
+
+  @computed get Alert() {
+    return new AlertBar;
+  }
+
 
   @action handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     this.formData[e.target.name as keyof typeof this.formData] = e.target.value;
@@ -49,13 +56,19 @@ export default class Login implements ViewComponent {
     this.validateForm();
 
     if (this.validateForm()) {
-      await GlobalEntities.login(this.formData.email, this.formData.password);
-      alert("Sikeres bejelentkezés!");
-      this.navigate("/home");
+      const resp = await GlobalEntities.login(this.formData.email, this.formData.password);
+      if (resp.code == 1) {
+        this.Alert.toggleAlert(true, resp.message, "success");
+        setTimeout(() => {this.navigate("/home");}, 2500);
+      }
+      else{
+        this.Alert.toggleAlert(true, resp.message, "error");
+      }
+      
     }
   };
 
-  View = () => (
+  View = observer(() => (
     <Box
       component={Paper}
       elevation={3}
@@ -122,6 +135,8 @@ export default class Login implements ViewComponent {
           </Button>
         </Link>
       </Typography>
+      {<this.Alert.View />}
     </Box>
-  );
+    
+  ));
 }
