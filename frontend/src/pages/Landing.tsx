@@ -32,7 +32,7 @@ export default class Landing implements ViewComponent {
     View = () => (
         <Box sx={{ bgcolor: "#fff", minHeight: "100vh", fontFamily: "'Inter', sans-serif" }}>
             <Container maxWidth="lg" sx={{ py: 10 }}>
-                {/* Hero Section */}
+                {}
                 <Box textAlign="center" mb={6}>
                     <Typography
                         variant="h2"
@@ -40,7 +40,11 @@ export default class Landing implements ViewComponent {
                         sx={{
                             background: "linear-gradient(to right, #1976d2, #00bcd4)",
                             WebkitBackgroundClip: "text",
-                            WebkitTextFillColor: "transparent"
+                            WebkitTextFillColor: "transparent",
+                            fontSize:{
+                                xs: "2rem",
+                                sm: "3.75rem"
+                            }
                         }}
                         gutterBottom
                     >
