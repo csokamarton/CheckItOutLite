@@ -2,9 +2,10 @@ import { ChangeEvent, FormEvent } from "react";
 import { NavigateFunction } from "react-router-dom";
 import ViewComponent from "../interfaces/ViewComponent";
 import { observer } from "mobx-react-lite";
-import { Box, Button, Container, FormControl, Paper, Stack, TextField, Typography } from "@mui/material";
-import { action, makeObservable, observable } from "mobx";
+import { Box, Button, Container, FormControl, Paper, Snackbar, Stack, TextField, Typography } from "@mui/material";
+import { action, computed, makeObservable, observable } from "mobx";
 import GlobalEntities from "../store/GlobalEntities";
+import AlertBar from "../components/AlertBar";
 
 export default class Register implements ViewComponent {
 
@@ -31,9 +32,14 @@ export default class Register implements ViewComponent {
       newUser: observable,
       errors: observable,
       submitForm: action,
-      handleChange: action
+      handleChange: action,
+      Alert: computed
     });
   }
+
+  @computed get Alert() {
+    return new AlertBar;
+ }
 
   @action submitForm = async (event: FormEvent) => {
     event.preventDefault();
@@ -41,11 +47,15 @@ export default class Register implements ViewComponent {
     if (!this.checkErrors()) {
       const resp = await GlobalEntities.register(this.newUser);
       if (resp.code === 1) {
-        alert(resp.message);
-        this.navigate("/login");
+        
+        this.Alert.toggleAlert(true, resp.message, "success");
+        setTimeout(() => {
+          this.navigate("/login");
+         }, 2500)
+        
       }
       else {
-        alert(resp.message);
+        this.Alert.toggleAlert(true, resp.message, "error");
       }
     }
   }
@@ -193,6 +203,7 @@ export default class Register implements ViewComponent {
           </Stack>
         </Box>
       </Stack>
+        {<this.Alert.View />}
     </Container>
   );
 }
