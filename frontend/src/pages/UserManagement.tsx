@@ -101,36 +101,33 @@ export default class UserManagement implements ViewComponent {
   @action validateForm = async () => {
     const emails = await GlobalEntities.getUsedEmail();
 
-    if (!this.editedUser.name || this.editedUser.name.trim() === "") {
-      this.errors.name = "Név megadása kötelező";
-      this.errors.nameError = true;
-      return;
+    switch (true) {
+      case this.editedUser.name === "":
+        this.errors.name = "Név megadása kötelező";
+        this.errors.nameError = true;
+        return;
+
+      case this.editedUser.email === "":
+        this.setErrorsDefault();
+        this.errors.email = "E-mail cím megadása kötelező";
+        this.errors.emailError = true;
+        return;
+      case !(this.editedUser.email as string).includes("@"):
+        this.setErrorsDefault();
+        this.errors.email = "Valós E-mail cím megadása kötelező";
+        this.errors.emailError = true;
+        return;
+
+      case emails.includes(this.editedUser.email as string):
+        this.setErrorsDefault();
+        this.errors.email = "Ez az e-mail cím már foglalt";
+        this.errors.emailError = true;
+        return;
+      default:
+        this.setErrorsDefault();
+        break;
     }
-
-    if (!this.editedUser.email || this.editedUser.email.trim() === "") {
-      this.setErrorsDefault();
-      this.errors.email = "E-mail cím megadása kötelező";
-      this.errors.emailError = true;
-      return;
-    }
-
-    if (!this.editedUser.email.includes("@")) {
-      this.setErrorsDefault();
-      this.errors.email = "Valós E-mail cím megadása kötelező";
-      this.errors.emailError = true;
-      return;
-    }
-
-    if (emails.includes(this.editedUser.email)) {
-      this.setErrorsDefault();
-      this.errors.email = "Ez az e-mail cím már foglalt";
-      this.errors.emailError = true;
-      return;
-    }
-
-    this.setErrorsDefault();
-  };
-
+  }
 
 
   View = observer(() => (
