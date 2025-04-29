@@ -42,10 +42,14 @@ const chrome = require('selenium-webdriver/chrome');
         // Select a role (e.g. admin)
         const roleSelect = await driver.findElement(By.css('table tbody tr:first-child [name="role"]'));
         await roleSelect.click();
-        await driver.sleep(500); 
+        await driver.sleep(500);
         const adminOption = await driver.findElement(By.css('li[data-value="admin"]'));
         await adminOption.click();
 
+
+        // Click the Save button
+        const saveButton = await driver.findElement(By.css('table tbody tr:first-child button svg[data-testid="SaveIcon"]'));
+        await saveButton.findElement(By.xpath('..')).click();
 
     } catch (err) {
         console.error('Error:', err);
