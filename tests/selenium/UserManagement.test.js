@@ -23,10 +23,15 @@ const chrome = require('selenium-webdriver/chrome');
 
         // Clicking on the first user's edit button
         const firstEditButton = await driver.findElement(By.css('table tbody tr:first-child button svg[data-testid="EditIcon"]'));
-        await firstEditButton.findElement(By.xpath('..')).click(); 
+        await firstEditButton.findElement(By.xpath('..')).click();
 
-        await driver.sleep(500); 
+        await driver.sleep(500);
 
+
+        // Overwrite the "Name" field
+        const nameField = await driver.findElement(By.css('table tbody tr:first-child input[name="name"]'));
+        await nameField.clear();
+        await nameField.sendKeys('Teszt Felhasználó');
 
     } catch (err) {
         console.error('Error:', err);
