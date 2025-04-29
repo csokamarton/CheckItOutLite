@@ -20,12 +20,6 @@ class AdminController extends Controller
     }
 
 
-    public function listUsers()
-    {
-        $users = User::all();
-        return response()->json($users);
-    }
-
     public function createUser(CreateUserRequest $request)
     {
         $validated = $request->validated();

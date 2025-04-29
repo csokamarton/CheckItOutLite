@@ -24,7 +24,6 @@ class ScheduleResource extends JsonResource
             'user_id' => $this->user_id,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
-            //'task' => TaskResource::collection($this->whenLoaded("task"));
 
         ];
     }
