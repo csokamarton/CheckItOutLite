@@ -13,6 +13,7 @@ import {
   Select,
   MenuItem,
   Stack,
+  SelectChangeEvent,
 } from "@mui/material";
 import { Edit, Delete, Save, Cancel, ThirtyFpsRounded } from "@mui/icons-material";
 import ViewComponent from "../interfaces/ViewComponent";
@@ -55,6 +56,7 @@ export default class UserManagement implements ViewComponent {
     e:
       | ChangeEvent<HTMLInputElement>
       | ChangeEvent<{ name?: string; value: unknown }>
+      | SelectChangeEvent<string>
   ) => {
     const { name, value } = e.target;
     if (!name) return;
