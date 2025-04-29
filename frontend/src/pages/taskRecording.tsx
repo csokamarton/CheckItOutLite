@@ -7,6 +7,7 @@ import { action, computed, makeObservable, observable, toJS } from 'mobx';
 import { NavigateFunction } from 'react-router-dom';
 import GlobalEntities from '../store/GlobalEntities';
 import { observer } from 'mobx-react-lite';
+import AlertBar from '../components/AlertBar';
 
 
 export default class TaskRecording implements ViewComponent {
@@ -125,8 +126,11 @@ export default class TaskRecording implements ViewComponent {
       this.formData.due_date = (this.formData.due_date as Date).toISOString().slice(0, 19).replace("T", " ")
       const resp = await GlobalEntities.createTask(this.formData);
       if (resp.status === 201) {
-        alert("Sikeresen létrehozva");
-        this.navigate("home")
+        this.Alert.toggleAlert(true, "Sikeresen létrehozva", "success");
+        setTimeout(() => {
+          this.navigate("/home");
+         }, 2500)
+        
       }
     }
   }
@@ -157,6 +161,10 @@ export default class TaskRecording implements ViewComponent {
       categoryError: false
     };
   }
+
+  @computed get Alert() {
+      return new AlertBar;
+   }
 
   View = observer(() => (
     <Stack maxWidth={720} padding={20} margin={"auto"}>
@@ -251,7 +259,9 @@ export default class TaskRecording implements ViewComponent {
           </form>
         </Card.Body>
       </Card.Root>
-
+    {
+      < this.Alert.View/>
+    }
     </Stack>
   ));
 }
