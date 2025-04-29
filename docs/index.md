@@ -17,3 +17,6 @@ Csóka Márton, Molnár Márk
 [Dokumentáció](https://www.notion.so/1de14af4e9c780008bb6c0be9501c179?v=1de14af4e9c7811598f5000ca7d57257&pvs=4)
 
 [Felhasználói segédlet](userManual/index.md)
+
+[old - Github](https://github.com/csokamarton/CheckItOut.git)
+[new - Github](https://github.com/csokamarton/CheckItOutLite.git)
