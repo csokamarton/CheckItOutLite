@@ -17,6 +17,13 @@ A start.sh futtatásával indítható
 Adatbázis létrehozása és mintaadatok feltöltése
 ```docker compose exec backend php artisan migrate:fresh --seed```
 
+##### Felhasználók
+
+Seed után elérhető felhasználók
+
+- Admin felhasználó: email: ```admin@admin.com``` jelszó: ```admin1234```
+- User felhasználó: email: ```user@user.com``` jelszó: ```user1234```
+
 ### 3. Projekt megtekintése 
 
 Nyisd meg az egyik bőngészőben a projektet, az alábbi linken: 
