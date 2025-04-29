@@ -20,6 +20,14 @@ const chrome = require('selenium-webdriver/chrome');
         // Waiting for the first row of the table to load
         await driver.wait(until.elementLocated(By.css('table tbody tr')), 10000);
 
+
+        // Clicking on the first user's edit button
+        const firstEditButton = await driver.findElement(By.css('table tbody tr:first-child button svg[data-testid="EditIcon"]'));
+        await firstEditButton.findElement(By.xpath('..')).click(); 
+
+        await driver.sleep(500); 
+
+
     } catch (err) {
         console.error('Error:', err);
     } finally {
