@@ -51,6 +51,25 @@ const chrome = require('selenium-webdriver/chrome');
         const saveButton = await driver.findElement(By.css('table tbody tr:first-child button svg[data-testid="SaveIcon"]'));
         await saveButton.findElement(By.xpath('..')).click();
 
+
+        // Check if name and email are updated
+
+        await driver.sleep(1500);
+        
+        const updatedName = await driver.findElement(By.css('table tbody tr:first-child td:nth-child(1)')).getText();
+        const updatedEmail = await driver.findElement(By.css('table tbody tr:first-child td:nth-child(2)')).getText();
+        const updatedRole = await driver.findElement(By.css('table tbody tr:first-child td:nth-child(3)')).getText();
+
+        if (updatedName === 'Teszt Felhasználó' && updatedEmail === 'teszt@example.com' && updatedRole === 'admin') {
+            console.log('User updated successfully.');
+        
+        } else {
+            console.error('User update failed.');
+        
+        }
+
+
+
     } catch (err) {
         console.error('Error:', err);
     } finally {
