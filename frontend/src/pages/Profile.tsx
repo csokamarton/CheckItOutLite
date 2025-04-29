@@ -105,32 +105,36 @@ export default class Profile implements ViewComponent {
 
     @action validateForm = async () => {
         const emails = await GlobalEntities.getUsedEmail();
-
-        if (this.name === "") {
-            this.errors.name = "Név megadása kötelező",
-                this.errors.nameError = true;
+      
+        switch (true) {
+          case this.name === "":
+            this.errors.name = "Név megadása kötelező";
+            this.errors.nameError = true;
             return;
-        }
-        this.setErrorsDefault();
-        if (this.email === "") {
-            this.errors.email = "E-mail cím megadása kötelező",
-                this.errors.emailError = true;
+      
+          case this.email === "":
+            this.setErrorsDefault();
+            this.errors.email = "E-mail cím megadása kötelező";
+            this.errors.emailError = true;
             return;
-        }
-        this.setErrorsDefault();
-        if (!this.email.includes('@')) {
-            this.errors.email = "Valós e-mail cím megadása kötelező",
-                this.errors.emailError = true;
+      
+          case !this.email.includes("@"):
+            this.setErrorsDefault();
+            this.errors.email = "Valós e-mail cím megadása kötelező";
+            this.errors.emailError = true;
             return;
-        }
-        this.setErrorsDefault();
-        if (emails.includes(this.email)) {
-            this.errors.email = "Ez az e-mail cím már foglalt",
-                this.errors.emailError = true;
+      
+          case emails.includes(this.email):
+            this.setErrorsDefault();
+            this.errors.email = "Ez az e-mail cím már foglalt";
+            this.errors.emailError = true;
             return;
+      
+          default:
+            this.setErrorsDefault();
         }
-        this.setErrorsDefault();
-    }
+      };
+      
 
     @action setErrorsDefault = () => {
         this.errors = {
