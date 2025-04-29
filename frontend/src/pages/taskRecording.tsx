@@ -62,43 +62,47 @@ export default class TaskRecording implements ViewComponent {
   }
 
   @action validateForm = () => {
-    if (this.formData.title == "") {
-      this.errors.titleError = true;
-      this.errors.title = "Feladat név megadása kötelező";
-      return;
+    switch (true) {
+      case this.formData.title == "":
+        this.errors.titleError = true;
+        this.errors.title = "Feladat név megadása kötelező";
+        return;
+  
+      case this.formData.title.length > 50:
+        this.setErrorsDefault();
+        this.errors.titleError = true;
+        this.errors.title = "Feladat név nem lehet hosszabb 50 karakternél";
+        return;
+  
+      case this.formData.description.length > 255:
+        this.setErrorsDefault();
+        this.errors.descriptionError = true;
+        this.errors.description = "A leírás nem lehet hosszabb 255 karakternél";
+        return;
+  
+      case this.formData.due_date < this.today:
+        this.setErrorsDefault();
+        this.errors.due_dateError = true;
+        this.errors.due_date = "Feladat határideje nem lehet korábban mint ma";
+        return;
+  
+      case this.formData.priority < 0 || this.formData.priority > 10:
+        this.setErrorsDefault();
+        this.errors.priotityError = true;
+        this.errors.priority = "Prioritás 0 és 10 közzé kell essen";
+        return;
+  
+      case this.formData.category_id == 0:
+        this.setErrorsDefault();
+        this.errors.categoryError = true;
+        this.errors.category = "Kategória választása kötelező";
+        return;
+  
+      default:
+        this.setErrorsDefault();
     }
-    this.setErrorsDefault();
-    if (this.formData.title.length > 50) {
-      this.errors.titleError = true;
-      this.errors.title = "Feladat név nem lehet hosszabb 50 karakternél";
-      return;
-    }
-    this.setErrorsDefault();
-    if (this.formData.description.length > 255) {
-      this.errors.descriptionError = true;
-      this.errors.description = "A leírás nem lehet hosszabb 255 karakternél";
-      return;
-    }
-    this.setErrorsDefault();
-    if (this.formData.due_date < this.today) {
-      this.errors.due_dateError = true;
-      this.errors.due_date = "Feladat határideje nem lehet korábban mint ma";
-      return;
-    }
-    this.setErrorsDefault();
-    if (this.formData.priority < 0 || this.formData.priority > 10) {
-      this.errors.priotityError = true;
-      this.errors.priority = "Prioritás 0 és 10 közzé kell essen";
-      return;
-    }
-    this.setErrorsDefault();
-    if (this.formData.category_id == 0) {
-      this.errors.categoryError = true;
-      this.errors.category = "Kategória választása kötelező";
-      return;
-    }
-    this.setErrorsDefault();
-  }
+  };
+  
 
   @action handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
