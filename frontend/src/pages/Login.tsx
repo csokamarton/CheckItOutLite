@@ -15,7 +15,7 @@ export default class Login implements ViewComponent {
     password: "",
   };
 
-  errors: { [key: string]: string } = {};
+  errors: { [key: string]: string | boolean } = {};
 
   constructor(public navigate: NavigateFunction) {
     makeObservable(this, {
@@ -23,7 +23,6 @@ export default class Login implements ViewComponent {
       errors: observable,
       handleChange: action,
       validateForm: action,
-      isValidForm: computed,
       handleSubmit: action,
     });
   }
@@ -35,6 +34,7 @@ export default class Login implements ViewComponent {
 
   @action handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     this.formData[e.target.name as keyof typeof this.formData] = e.target.value;
+    this.validateForm();
   };
 
   @computed get isValidForm() {
@@ -42,9 +42,15 @@ export default class Login implements ViewComponent {
   }
 
   @action validateForm = () => {
-    const newErrors: { [key: string]: string } = {};
-    if (!this.formData.email.includes("@")) newErrors.email = "Érvényes e-mail szükséges!";
-    if (this.formData.password.length < 6) newErrors.password = "A jelszónak legalább 6 karakterből kell állnia!";
+    const newErrors: { [key: string]: string | boolean } = {};
+    if (!this.formData.email.includes("@")) { 
+      newErrors.email = "Érvényes e-mail szükséges!";
+      newErrors.emailError = true;
+    }
+    if (this.formData.password.length < 6) { 
+      newErrors.password = "A jelszónak legalább 6 karakterből kell állnia!";
+      newErrors.passwordError = true;
+    }
 
     this.errors = newErrors;
 
@@ -53,7 +59,6 @@ export default class Login implements ViewComponent {
 
   @action handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    this.validateForm();
 
     if (this.validateForm()) {
       const resp = await GlobalEntities.login(this.formData.email, this.formData.password);
@@ -85,7 +90,7 @@ export default class Login implements ViewComponent {
       <Typography variant="h3" component="h1" gutterBottom>
         Bejelentkezés
       </Typography>
-      <form onSubmit={this.handleSubmit}>
+      <form onSubmit={this.handleSubmit} noValidate>
         <TextField
           fullWidth
           margin="normal"
@@ -93,6 +98,8 @@ export default class Login implements ViewComponent {
           name="email"
           type="email"
           onChange={this.handleChange}
+          error={this.errors.emailError as boolean}
+          helperText={this.errors.email}
         />
         <TextField
           fullWidth
@@ -100,8 +107,9 @@ export default class Login implements ViewComponent {
           label="Jelszó"
           name="password"
           type="password"
-
           onChange={this.handleChange}
+          error={this.errors.passwordError as boolean}
+          helperText={this.errors.password}
         />
         <Button
           type="submit"
