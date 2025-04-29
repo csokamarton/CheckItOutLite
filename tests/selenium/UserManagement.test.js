@@ -39,6 +39,14 @@ const chrome = require('selenium-webdriver/chrome');
         await emailField.clear();
         await emailField.sendKeys('teszt@example.com');
 
+        // Select a role (e.g. admin)
+        const roleSelect = await driver.findElement(By.css('table tbody tr:first-child [name="role"]'));
+        await roleSelect.click();
+        await driver.sleep(500); 
+        const adminOption = await driver.findElement(By.css('li[data-value="admin"]'));
+        await adminOption.click();
+
+
     } catch (err) {
         console.error('Error:', err);
     } finally {
