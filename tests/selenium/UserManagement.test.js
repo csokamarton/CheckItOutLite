@@ -33,6 +33,12 @@ const chrome = require('selenium-webdriver/chrome');
         await nameField.clear();
         await nameField.sendKeys('Teszt Felhasználó');
 
+
+        // Rewrite the "Email" field
+        const emailField = await driver.findElement(By.css('table tbody tr:first-child input[name="email"]'));
+        await emailField.clear();
+        await emailField.sendKeys('teszt@example.com');
+
     } catch (err) {
         console.error('Error:', err);
     } finally {
