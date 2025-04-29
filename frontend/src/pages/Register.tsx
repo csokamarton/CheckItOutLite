@@ -66,51 +66,54 @@ export default class Register implements ViewComponent {
 
   @action validateForm = async () => {
     const emails = await GlobalEntities.getUsedEmail();
-
-    if (this.newUser.name === "") {
-      this.errors.name = "Név megadása kötelező";
-      this.errors.nameError = true;
-      return;
+  
+    switch (true) {
+      case this.newUser.name === "":
+        this.errors.name = "Név megadása kötelező";
+        this.errors.nameError = true;
+        return;
+  
+      case this.newUser.email === "":
+        this.setErrorsDefault();
+        this.errors.email = "E-mail cím megadása kötelező";
+        this.errors.emailError = true;
+        return;
+  
+      case !this.newUser.email.includes("@"):
+        this.setErrorsDefault();
+        this.errors.email = "Valós E-mail cím megadása kötelező";
+        this.errors.emailError = true;
+        return;
+  
+      case emails.includes(this.newUser.email):
+        this.setErrorsDefault();
+        this.errors.email = "Ez az e-mail cím már foglalt";
+        this.errors.emailError = true;
+        return;
+  
+      case this.newUser.password === "":
+        this.setErrorsDefault();
+        this.errors.password = "Jelszó megadása kötelező";
+        this.errors.passwordError = true;
+        return;
+  
+      case this.newUser.password.length < 8:
+        this.setErrorsDefault();
+        this.errors.password = "Jelszónak minimum 8 karakter hosszúnak kell lennie";
+        this.errors.passwordError = true;
+        return;
+  
+      case this.newUser.password_confirmation !== this.newUser.password:
+        this.setErrorsDefault();
+        this.errors.password_confirmation = "A jelszó nem egyezik";
+        this.errors.password_confirmationError = true;
+        return;
+  
+      default:
+        this.setErrorsDefault();
     }
-    this.setErrorsDefault();
-    if (this.newUser.email === "") {
-      this.errors.email = "E-mail cím megadása kötelező";
-      this.errors.emailError = true;
-      return;
-    }
-    this.setErrorsDefault();
-    if (!this.newUser.email.includes("@")) {
-      this.errors.email = "Valós E-mail cím megadása kötelező";
-      this.errors.emailError = true;
-      return;
-    }
-    this.setErrorsDefault();
-    if (emails.includes(this.newUser.email)) {
-      this.errors.email = "Ez az e-mail cím már foglalt";
-      this.errors.emailError = true;
-      return;
-    }
-    this.setErrorsDefault();
-    if (this.newUser.password === "") {
-      this.errors.password = "Jelszó megadása kötelező";
-      this.errors.passwordError = true;
-      return;
-    }
-    this.setErrorsDefault();
-    if (this.newUser.password.length < 8) {
-      this.errors.password = "Jelszónak minimum 8 karakter hosszúnak kell lennie";
-      this.errors.passwordError = true;
-      return;
-    }
-    this.setErrorsDefault();
-    if (this.newUser.password_confirmation !== this.newUser.password) {
-      this.errors.password_confirmation = "A jelszó nem egyezik";
-      this.errors.password_confirmationError = true;
-      return;
-    }
-    this.setErrorsDefault();
-
-  }
+  };
+  
 
   @action setErrorsDefault = () => {
     this.errors = {
